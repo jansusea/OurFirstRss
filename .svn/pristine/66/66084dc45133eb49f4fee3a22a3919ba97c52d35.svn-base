@@ -1,0 +1,43 @@
+package com.skyrss.details;
+
+
+import com.skyrss.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.webkit.WebView;
+import android.widget.TextView;
+
+public class Details extends Activity {
+	
+	private TextView tv_title;
+	private TextView tv_data;
+	private WebView wv_showdetails;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_details);
+		
+		initView();
+		initData();
+	}
+	
+	public void initView(){
+		tv_title = (TextView) findViewById(R.id.tv_details_title);
+		tv_data = (TextView) findViewById(R.id.tv_details_date);
+		wv_showdetails = (WebView) findViewById(R.id.wv_details_showcontent);
+		
+	}
+	
+	public void initData(){
+		//获得从listView中传过来的数据
+		tv_title.setText("从listView中传过来的数据position");
+		tv_data.setText("从listView中获取的数据position.来源  时间");
+		wv_showdetails.loadUrl("#");
+		
+		
+	}
+
+}

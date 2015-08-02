@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <declare-styleable name="com.skyrss.ui.SettingItem_Jump">
+             <attr name="itemtitle" format="string"/>
+             <attr name="itemdescription" format="string"/>
+        </declare-styleable>
+        
+        <declare-styleable name="com.skyrss.ui.SettingItem">
+             <attr name="title" format="string"/>
+             <attr name="description" format="string"/>
+             <attr name="isnightmode" format="boolean"/>
+        </declare-styleable>
+        
+        
+</resources>

@@ -1,0 +1,115 @@
+package com.skyrss.details;
+
+
+import com.skyrss.R;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebSettings.TextSize;
+import android.widget.TextView;
+
+public class Details extends Activity {
+	
+	private TextView tv_title;
+	private TextView tv_data;
+	private WebView wv_showdetails;
+	private WebSettings size_setting;
+	private AlertDialog alertDialog;
+	private int checkItem;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_details);
+		
+		initView();
+		initData();
+	}
+	
+	public void initView(){
+		tv_title = (TextView) findViewById(R.id.tv_details_title);
+		tv_data = (TextView) findViewById(R.id.tv_details_date);
+		wv_showdetails = (WebView) findViewById(R.id.wv_details_showcontent);
+		
+		
+		
+	}
+	
+	public void initData(){
+		//获得从listView中传过来的数据
+		tv_title.setText("从listView中传过来的数据position");
+		tv_data.setText("从listView中获取的数据position.来源  时间");
+		wv_showdetails.loadUrl("http://zhbj.qianlong.com/static/html/2014/11/07/7743665E4E6B10766F26.html");
+		size_setting = wv_showdetails.getSettings();
+		size_setting.setTextSize(TextSize.NORMAL);
+		checkItem = 2;
+		
+	}
+	
+	public void back(View v){
+		//可以做一个滑动删除的页面
+		finish();
+	}
+	public void changesize(View v){
+
+
+		final String[] items = { "最大", "较大", "一般", "较小", "最小" };
+
+		Builder builder = new Builder(this);
+		builder.setTitle("请选择字体大小");
+		builder.setSingleChoiceItems(items, checkItem, new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				switch (which) {
+				case 0:
+					size_setting.setTextSize(TextSize.LARGEST);
+					checkItem = 0;
+					break;
+				case 1:
+					size_setting.setTextSize(TextSize.LARGER);
+					checkItem = 1;
+					break;
+				case 2:
+					size_setting.setTextSize(TextSize.NORMAL);
+					checkItem = 2;
+					break;
+				case 3:
+					size_setting.setTextSize(TextSize.SMALLER);
+					checkItem = 3;
+					break;
+				case 4:
+					size_setting.setTextSize(TextSize.SMALLEST);
+					checkItem = 4;
+					break;
+				default:
+					break;
+				}
+				alertDialog.dismiss();
+			}
+		});
+		builder.setNegativeButton("取消", null);
+		alertDialog = builder.show();
+
+	
+	}
+	public void changemode(View v){
+		
+	}
+	public void changelight(View v){
+		
+	}
+	public void share(View v){
+		
+	}
+
+}

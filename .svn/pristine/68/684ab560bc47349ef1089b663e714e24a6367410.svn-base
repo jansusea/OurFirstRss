@@ -1,0 +1,51 @@
+package com.skyrss;
+
+import com.skyrss.details.Details;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+public class SourceActivity extends Activity {
+
+	
+	private String[] strs;
+	private String[] contents;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_source);
+		
+		strs = new String[] {"新闻源1","新闻源2","新闻源3","新闻源4","新闻源5"};
+		contents = new String[] {"标题1","标题1","标题1","标题1","标题1","标题1","标题1"};
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, contents);
+		TextView tView = (TextView) findViewById(R.id.tv_source_title);
+		ListView lv = (ListView) findViewById(R.id.lv_source_titlelist);
+		
+		Intent intent = getIntent();
+		int source = intent.getIntExtra("source", 0);
+		
+		lv.setAdapter(adapter);
+		tView.setText(strs[source]);
+		
+		lv.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(SourceActivity.this, Details.class);
+				startActivity(intent);
+			}
+		});
+	}
+	
+}

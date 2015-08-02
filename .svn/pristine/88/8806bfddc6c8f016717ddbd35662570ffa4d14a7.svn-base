@@ -1,0 +1,307 @@
+package com.skyrss;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.skyrss.setting.Dialog;
+import com.skyrss.setting.MoreSetting;
+import com.skyrss.setting.UserFeedbackActivity;
+import com.skyrss.utils.ChangeAppBrightness;
+import com.skyrss.ui.SettingItem;
+import com.skyrss.ui.SettingItemJump;
+
+public class SettingActivity extends Activity implements OnClickListener {
+
+	private static final String TAG = null;
+
+	SharedPreferences sp;
+
+	// 设置夜间模式
+	public Boolean currentNightMode = false;
+	private SettingItem isnight;
+	private SettingItemJump userfeed;
+	private SettingItemJump download;
+	private SettingItemJump clearcache;
+	private SettingItemJump moresettting;
+	private SettingItemJump update;
+	private SettingItemJump goodcomment;
+	private SettingItemJump aboutus;
+	private ImageButton ib_back;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_setting);
+		sp = getSharedPreferences("config", MODE_PRIVATE);
+
+		isnight = (SettingItem) findViewById(R.id.si_setting_isnight);
+		download = (SettingItemJump) findViewById(R.id.si_setting_download);
+		clearcache = (SettingItemJump) findViewById(R.id.si_setting_clearcache);
+		moresettting = (SettingItemJump) findViewById(R.id.si_setting_moresetting);
+		userfeed = (SettingItemJump) findViewById(R.id.si_setting_userfeed);
+		update = (SettingItemJump) findViewById(R.id.si_setting_updade);
+		goodcomment = (SettingItemJump) findViewById(R.id.si_setting_good);
+		aboutus = (SettingItemJump) findViewById(R.id.si_setting_aboutus);
+
+		ib_back = (ImageButton) findViewById(R.id.ib_home_slidingmenu);
+
+		isnight.setOnClickListener(this);
+		download.setOnClickListener(this);
+		clearcache.setOnClickListener(this);
+		moresettting.setOnClickListener(this);
+		userfeed.setOnClickListener(this);
+		update.setOnClickListener(this);
+		goodcomment.setOnClickListener(this);
+		aboutus.setOnClickListener(this);
+
+		ib_back.setOnClickListener(this);
+	}
+
+	@Override
+	protected void onResume() {
+		currentNightMode = sp.getBoolean("nightmode", false);
+		if (currentNightMode) {
+			ChangeAppBrightness.change(this, 3);
+		} else {
+			ChangeAppBrightness.change(this, 200);
+		}
+		super.onResume();
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.si_setting_isnight:
+			changemode();
+			break;
+		case R.id.si_setting_download:
+			Toast.makeText(this, "离线下载功能", 0).show();
+			break;
+		case R.id.si_setting_clearcache:
+			deleteCache();
+			break;
+		case R.id.si_setting_moresetting:
+			startActivity(new Intent().setClass(this, MoreSetting.class));
+			break;
+		case R.id.si_setting_userfeed:
+			Intent intent = new Intent(this, UserFeedbackActivity.class);
+			startActivity(intent);
+			break;
+		case R.id.si_setting_updade:
+			checkupdate();
+			break;
+		case R.id.si_setting_good:
+			try {
+				Uri uri = Uri.parse("market://details?id=" + getPackageName());
+				Intent goodcomments = new Intent(Intent.ACTION_VIEW, uri);
+				goodcomments.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(goodcomments);
+			} catch (ActivityNotFoundException e) {
+				Toast.makeText(this, "出现错误 !", Toast.LENGTH_SHORT).show();
+			}
+			break;
+		case R.id.si_setting_aboutus:
+			startActivity(new Intent().setClass(this, MoreSetting.class));
+			break;
+
+		case R.id.ib_home_slidingmenu:
+			// 返回按钮
+			finish();
+			break;
+		default:
+			Toast.makeText(this, "没有找到", 0).show();
+			break;
+		}
+	}
+	private void deleteCache(){
+		File directory = new File(getCacheDir()+"");
+		Boolean success=deleteDir(directory);
+		if(success){
+			Toast.makeText(this, "成功清理缓存", 0).show();
+		}else{
+			Toast.makeText(this, "出现错误，请反馈", 0).show();
+		}
+	}
+	private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] filelist = dir.list();
+            //递归删除目录中的子目录下
+            for (int i=0; i<filelist.length; i++) {
+                boolean success = deleteDir(new File(dir, filelist[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        // 目录此时为空，可以删除
+        return dir.delete();
+    }
+
+	public void changemode() {
+		currentNightMode = sp.getBoolean("nightmode", false);
+		Editor et = sp.edit();
+		if (currentNightMode) {
+			ChangeAppBrightness.change(this, 200);
+			et.putBoolean("nightmode", !currentNightMode);
+		} else {
+			ChangeAppBrightness.change(this, 2);
+			et.putBoolean("nightmode", !currentNightMode);
+		}
+		et.commit();
+
+	}
+
+	private void checkupdate() {
+		final ProgressDialog pDialog = new ProgressDialog(SettingActivity.this);
+
+		HttpUtils utils = new HttpUtils();
+		String url = "http://skyrssreader.sinaapp.com/version.json";
+		utils.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+
+			@Override
+			public void onLoading(long total, long current, boolean isUploading) {
+				super.onLoading(total, current, isUploading);
+				if (isUploading) {
+					pDialog.setMessage("正在上传..");
+					pDialog.setIndeterminate(false);
+					pDialog.setCancelable(true);
+					pDialog.show();
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException arg0, String arg1) {
+				Toast.makeText(SettingActivity.this, "连接网络失败", 0).show();
+			}
+
+			@Override
+			public void onSuccess(ResponseInfo<String> arg0) {
+				try {
+					pDialog.dismiss();
+					JSONObject object = new JSONObject(arg0.result);
+					String newversion = object.getString("version");
+					String oldversion = getVersion();
+					Log.d(TAG, "newversion," + newversion + "," + oldversion);
+					if (oldversion.equals(newversion)) {
+						Toast.makeText(SettingActivity.this, "已经是最新版本，不需要更新", 0)
+								.show();
+					} else {
+						String description = object.getString("description");
+						String ApkUrl = object.getString("ApkUrl");
+						Dialog.showDialog(SettingActivity.this, description
+								+ "", false);
+						AlertDialog.Builder builder = new AlertDialog.Builder(
+								SettingActivity.this);
+						builder.setTitle("检测到新版本:" + newversion);
+						builder.setMessage(description);
+						builder.setPositiveButton("升级", new myupgradelistener(
+								ApkUrl));
+						builder.setNegativeButton("取消", null);
+						builder.show();
+					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+	}
+
+	/**
+	 * 升级时的动作类
+	 * 
+	 * @author Administrator
+	 *
+	 */
+	class myupgradelistener implements DialogInterface.OnClickListener {
+		String url;
+
+		public myupgradelistener() {
+			super();
+		}
+
+		public myupgradelistener(String url) {
+			super();
+			this.url = url;
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			HttpUtils utils = new HttpUtils();
+			utils.send(HttpMethod.GET, url, new RequestCallBack<Byte>() {
+
+				@Override
+				public void onFailure(HttpException arg0, String arg1) {
+					Toast.makeText(SettingActivity.this, "不能下载到新版本", 0).show();
+				}
+
+				@Override
+				public void onSuccess(ResponseInfo<Byte> arg0) {
+					File file = new File(getFilesDir() + "/SkyRssReader.apk");
+					try {
+						FileOutputStream fos = new FileOutputStream(file);
+						fos.write(arg0.result);
+						fos.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					Intent intent = new Intent();
+					intent.setAction("android.intent.action.VIEW");
+					intent.addCategory("android.intent.category.DEFAULT");
+					intent.setDataAndType(Uri.fromFile(file),
+							"application/vnd.android.package-archive");
+					startActivityForResult(intent, 100);
+				}
+			});
+		}
+	}
+
+	// 获取版本号
+	private String getVersion() {
+		PackageManager packageManager = getPackageManager();
+		String version = "";
+		try {
+			PackageInfo packageInfo = packageManager.getPackageInfo(
+					getPackageName(), 0);
+			version = packageInfo.versionName;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return version;
+	}
+
+}

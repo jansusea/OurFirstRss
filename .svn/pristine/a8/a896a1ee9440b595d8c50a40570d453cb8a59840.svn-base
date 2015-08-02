@@ -1,0 +1,263 @@
+package com.skyrss.ui;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+
+import com.skyrss.R;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+public class RefreshListView extends  ListView{
+
+	private int mHeaderViewHeight;
+	int rawstartY ;
+	int rawendY ;
+	private View mHeaderView;
+
+	
+	private static final int STATE_PULL_REFRESH = 0;// ����ˢ��
+	private static final int STATE_RELEASE_REFRESH = 1;// �ɿ�ˢ��
+	private static final int STATE_REFRESHING = 2;// ����ˢ��
+	private int mCurrrentState = STATE_PULL_REFRESH;// ��ǰ״̬
+	
+	private ImageView iv_refreshhead_arr;
+	private ProgressBar pb_refreshhead_progress;
+	private TextView tv_refreshhead_title;
+	private TextView tv_refreshhead_time;
+	
+	
+	private View mFooterView;
+	private int mFooterViewHeight;
+
+
+	public RefreshListView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		initHeaderView();
+		initFooterView();
+ 	}
+
+
+
+
+	public RefreshListView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		initHeaderView();
+		initFooterView();
+
+		// TODO Auto-generated constructor stub
+	}
+
+	public RefreshListView(Context context) {
+		super(context);
+		initHeaderView();
+		initFooterView();
+
+		// TODO Auto-generated constructor stub
+	}
+	
+	
+
+	private void initHeaderView() {
+		mHeaderView = View.inflate(getContext(), R.layout.refreshheader_newstitlelist, null);
+		
+		this.addHeaderView(mHeaderView);
+		
+		mHeaderView.measure(0, 0);//�����ؼ��߶ȣ�0,0ΪĬ�ϲ���
+		mHeaderViewHeight = mHeaderView.getMeasuredHeight();
+		mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);// ����ͷ����
+
+		iv_refreshhead_arr = (ImageView)mHeaderView.findViewById(R.id.iv_refreshheader_arr);
+		pb_refreshhead_progress = (ProgressBar) mHeaderView.findViewById(R.id.pb_refreshheader_progress);
+		tv_refreshhead_title = (TextView) mHeaderView.findViewById(R.id.tv_refreshheader_title);
+		tv_refreshhead_time = (TextView) mHeaderView.findViewById(R.id.tv_refreshheader_time);
+		
+	}
+	
+	private void initFooterView() {
+		// TODO Auto-generated method stub
+		mFooterView = View.inflate(getContext(), R.layout.refreshfooter_newstitlelist, null);
+		
+		this.addFooterView(mFooterView); //�ӵ�listview�������
+		
+		mFooterView.measure(0, 0);
+		mFooterViewHeight = mFooterView.getMeasuredHeight();
+		mFooterView.setPadding(0, -mFooterViewHeight, 0, 0);// ���ؽŲ���
+		
+		this.setOnScrollListener(new MyOnScrollListener());
+	}
+
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		// TODO Auto-generated method stub
+
+
+		switch (ev.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			 rawstartY = (int) ev.getRawY();
+			break;
+		case MotionEvent.ACTION_MOVE:
+			
+			if (rawstartY == -1) {// ȷ��startY��Ч
+				rawstartY = (int) ev.getRawY();
+			}
+
+			rawendY = (int) ev.getRawY();
+
+			int dy = rawendY-rawstartY;
+			
+			System.out.println("RefreshListView.onTouchEvent()"+dy+":"+getFirstVisiblePosition());
+
+			if (dy>0 &&  getFirstVisiblePosition()==0) {
+				int padding =  dy-mHeaderViewHeight  ;       //-(mHeaderViewHeight-dy);
+				System.out.println("RefreshListView.onTouchEvent() setPadding"+padding);
+
+				if (mCurrrentState==STATE_REFRESHING) {//�����������ˢ�µ�ʱ�򣬾Ͳ����ж�
+					break;
+				}
+				
+				mHeaderView.setPadding(0, padding, 0, 0);
+				
+				if (padding>0&&mCurrrentState!=STATE_RELEASE_REFRESH) {
+					mCurrrentState = STATE_RELEASE_REFRESH;
+					refreshState();
+				}
+				else if (padding<0&& mCurrrentState!= STATE_PULL_REFRESH) {
+					mCurrrentState = STATE_PULL_REFRESH;
+					refreshState();
+
+				} 
+				
+			}
+			break;
+		case MotionEvent.ACTION_UP:
+			rawstartY = -1;
+			
+	        if (mCurrrentState==STATE_RELEASE_REFRESH) {
+	        	mCurrrentState=STATE_REFRESHING;
+				mHeaderView.setPadding(0, 0, 0, 0);
+
+				refreshState();
+				
+			}else if(mCurrrentState==STATE_PULL_REFRESH){
+				mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);
+
+			}
+			break;
+
+		default:
+			break;
+		}
+		
+		
+		return super.onTouchEvent(ev);
+	}
+	
+
+
+	private void refreshState() {
+		// TODO Auto-generated method stub
+		switch (mCurrrentState) {
+		case STATE_PULL_REFRESH:
+			tv_refreshhead_title.setText("下拉刷新");
+			iv_refreshhead_arr.setVisibility(View.VISIBLE);
+            pb_refreshhead_progress.setVisibility(View.INVISIBLE);
+			break;
+		case STATE_RELEASE_REFRESH:
+			tv_refreshhead_title.setText("释放刷新");
+			iv_refreshhead_arr.setVisibility(View.VISIBLE);
+            pb_refreshhead_progress.setVisibility(View.INVISIBLE);
+			break;
+		case STATE_REFRESHING:
+			tv_refreshhead_title.setText("正在刷新");
+			iv_refreshhead_arr.setVisibility(View.INVISIBLE);
+            pb_refreshhead_progress.setVisibility(View.VISIBLE);
+            if (mlistener!=null) {
+				mlistener.onRefesh();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
+	onRefreshListener mlistener;
+	public void setOnRefreshListner(onRefreshListener listener){	
+		 mlistener= listener;
+	}
+	
+	public interface onRefreshListener{	
+		public void onRefesh();
+		public void onLoadmore();
+	}
+	
+	
+	public String getCurrentTime() {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String time = format.format(new Date());
+		
+		return time ;
+	}
+	
+	
+	public void onRefreshComplete() {
+		if (isLoadingMore) {
+			mFooterView.setPadding(0, -mFooterViewHeight, 0, 0);// ����
+			isLoadingMore=false;
+		}else {
+			mCurrrentState = STATE_PULL_REFRESH;
+			tv_refreshhead_title.setText("下拉刷新");
+			iv_refreshhead_arr.setVisibility(View.VISIBLE);
+			pb_refreshhead_progress.setVisibility(View.INVISIBLE);
+
+			mHeaderView.setPadding(0, -mHeaderViewHeight, 0, 0);// ����
+		}
+		
+ 
+	}
+	
+	private boolean isLoadingMore = false;
+	class MyOnScrollListener implements OnScrollListener{
+
+		@Override
+		public void onScrollStateChanged(AbsListView view, int scrollState) {
+			// TODO Auto-generated method stub
+			if((scrollState== SCROLL_STATE_IDLE ||scrollState== SCROLL_STATE_FLING )&& !isLoadingMore){
+				if (getLastVisiblePosition()==getCount()-1) {//����������λ��
+					
+					
+					System.out
+							.println("RefreshListView.MyOnScrollListener.onScrollStateChanged()");
+					mFooterView.setPadding(0, 0, 0, 0);// ��ʾ
+					setSelection(getCount()-1);
+					isLoadingMore=true;
+					
+					if (mlistener!=null) {
+						mlistener.onLoadmore();
+					}
+				}
+				
+			}
+		}
+
+		@Override
+		public void onScroll(AbsListView view, int firstVisibleItem,
+				int visibleItemCount, int totalItemCount) {
+			// TODO Auto-generated method stub
+		}
+		
+		
+	}
+	
+
+}

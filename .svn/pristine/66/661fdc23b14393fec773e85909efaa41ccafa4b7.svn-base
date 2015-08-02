@@ -1,0 +1,20 @@
+package com.skyrss.utils;
+
+public class PubDateFormatUtils {
+	
+	public static String formatDate(String date) {
+		
+		String realDate = "";
+		if (date.contains("-")) {
+			realDate = date.replaceAll("\\s-\\d{4}", "");
+			System.out.println(date.replaceAll("\\s-\\d{4}", "")+"转换完成");
+		} else if (date.contains("+")) {
+			realDate = date.replaceAll("\\s\\+\\d{4}", "");
+			System.out.println(date.replaceAll("\\s\\+\\d{4}", "")+"转换完成");
+		}
+		
+		return realDate;
+	}
+	
+
+}

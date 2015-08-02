@@ -1,0 +1,128 @@
+package com.skyrss;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.skyrss.bean.NewsDetail;
+
+import com.skyrss.details.DetailsActivity;
+import com.skyrss.utils.XmlparserUtils;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+public class SourceActivity extends Activity {
+
+	
+	private String[] strs;
+	private String[] contents;
+	private NewsDetail detail;
+	private TextView tv_source_title;
+	private ListView lv_source_titlelist;
+	private MyNewsTitleListAdapter adapter;
+	private String[] urls;
+	private String sourceName;
+	
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_source);
+		
+		urls = new String[] {"http://cn.engadget.com/rss.xml", "http://www.zhihu.com/rss"};
+		
+		tv_source_title = (TextView) findViewById(R.id.tv_source_title);
+		lv_source_titlelist = (ListView) findViewById(R.id.lv_source_titlelist);
+		TextView tView = (TextView) findViewById(R.id.tv_source_title);
+		ListView lv = (ListView) findViewById(R.id.lv_source_titlelist);
+		
+		Intent intent = getIntent();
+		int source = intent.getIntExtra("source", 0);
+		sourceName = intent.getStringExtra("sourcename");
+		getDataFromInternet(source);
+		
+	}
+	
+	private void getDataFromInternet(int sourceid) {
+		
+		HttpUtils httpUtils = new HttpUtils();
+		httpUtils.send(HttpMethod.GET, urls[sourceid], new RequestCallBack<String>() {
+
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onSuccess(ResponseInfo<String> arg0) {
+				detail = XmlparserUtils.Xmlparse(arg0.result);
+				System.out.println(detail.items.size());
+				
+				tv_source_title.setText(detail.title);
+				adapter = new MyNewsTitleListAdapter();
+				lv_source_titlelist.setAdapter(adapter);
+				
+				
+				lv_source_titlelist.setOnItemClickListener(new OnItemClickListener() {
+
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view,
+							int position, long id) {
+						// TODO Auto-generated method stub
+						Intent intent = new Intent(SourceActivity.this, DetailsActivity.class);
+						intent.putExtra("title", detail.items.get(position).title);
+						intent.putExtra("url", detail.items.get(position).link);
+						intent.putExtra("sourcename", sourceName);
+						startActivity(intent);
+					}
+				});
+			}
+		});
+	}
+	
+	class MyNewsTitleListAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return detail.items.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			View v = View.inflate(SourceActivity.this, R.layout.items_newstitlelist, null);
+			TextView tv_newstitlelist_title = (TextView) v.findViewById(R.id.tv_newstitlelist_title);
+			tv_newstitlelist_title.setText(sourceName);
+			return v;
+		}
+		
+		
+	}
+	
+}

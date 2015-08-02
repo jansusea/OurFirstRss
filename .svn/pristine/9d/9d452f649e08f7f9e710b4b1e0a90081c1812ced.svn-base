@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:id="@+id/ll_details_title"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#99AADD"
+        android:orientation="vertical"
+        android:paddingLeft="5dp"
+        >
+        <TextView 
+            android:id="@+id/tv_details_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:text="测试数据 标题栏标题栏标题栏"
+            android:paddingTop="40dp"
+            />
+        <TextView 
+            android:id="@+id/tv_details_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="8sp"
+            android:textColor="#FFFFFF"
+            android:text="腾讯娱乐  4小时前"
+            />
+    </LinearLayout>
+    <WebView 
+        android:id="@+id/wv_details_showcontent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1000"
+        
+        />
+    <RelativeLayout 
+        android:id="@+id/ll_details_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#99AADD"
+        >
+        <ImageView
+            android:id="@+id/bt_details_back"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_back"
+            />
+        <ImageView
+            android:id="@+id/bt_details_setting"
+            android:layout_width="30sp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_setting"
+            android:layout_alignParentRight="true"
+            android:paddingRight="5dp"
+            />
+        
+    </RelativeLayout>
+    
+
+</LinearLayout>

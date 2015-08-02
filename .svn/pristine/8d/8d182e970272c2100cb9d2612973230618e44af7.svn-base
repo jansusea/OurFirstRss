@@ -1,0 +1,14 @@
+package com.skyrss.global;
+
+import com.skyrss.R;
+
+public class SourceList {
+
+	public static String[] sourceUrlList = {"http://cn.engadget.com/rss.xml", "http://www.zhihu.com/rss", "http://www.36kr.com/feed/"};
+	
+	public static String[] sourceNameList = {"Engadget中国", "知乎精选", "36氪"};
+	
+	public static int[] sourceIconList = {R.drawable.ic_engadget, R.drawable.ic_zhihu,
+		R.drawable.ic_36kr};
+	
+}

@@ -1,0 +1,21 @@
+package com.skyrss.utils;
+
+public class SetCssUtils {
+	
+	private static String headString;
+	private static String neededString;
+
+	public static String setCssToHtml(String html, int widthPixels) {
+		String finalString = "";
+		if (html.contains("<body")) {
+			int index = html.indexOf("<body");
+			String headString = html.substring(0, index+5);
+			String neededString = html.substring(index+5);
+			finalString = headString+" style=\"word-break:break-all;width:"+(widthPixels-10)+"px;font-family:Microsoft YaHei\""+neededString;
+		}
+		
+		
+		return finalString.replaceAll("<img ", "<img style=\"max-width:"+widthPixels+"px\"");
+	}
+
+}

@@ -1,0 +1,338 @@
+package com.skyrss.details;
+
+
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebSettings.TextSize;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+
+import com.skyrss.R;
+
+
+public class DetailsActivity extends Activity{
+	
+	private TextView tv_title;
+	private TextView tv_data;
+	private WebView wv_showdetails;
+	private WebSettings size_setting;
+	private int checkItem;
+	private PopupWindow popmenu;
+	private Button bt1;
+	private Button bt2;
+	private View popview;
+	
+	public static final int SIZE_SMALLEST = 0;
+	public static final int SIZE_SMALLER = 1;
+	public static final int SIZE_NOMAL = 2;
+	public static final int SIZE_LARGER = 3;
+	public static final int SIZE_LARGEST = 4;
+	
+	public static final int MODE_MOON = 5;
+	public static final int MODE_SUN = 6;
+	
+
+	public TextSize[] textSizes ={TextSize.SMALLEST,TextSize.SMALLER,TextSize.NORMAL,TextSize.LARGER,TextSize.LARGEST};
+	
+	public float currentLight;
+	public int currentMode ;
+	private ImageView iv_mode;
+	private ScrollView sv_webview;
+	private LinearLayout ll_bottom;
+	private RelativeLayout rl_title;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_details);
+		
+		initView();
+		initPopView();
+		initData();
+	}
+	
+	public void initView(){
+		rl_title = (RelativeLayout) findViewById(R.id.ll_details_title);
+		tv_title = (TextView) findViewById(R.id.tv_details_title);
+		tv_data = (TextView) findViewById(R.id.tv_details_date);
+		wv_showdetails = (WebView) findViewById(R.id.wv_details_showcontent);
+		wv_showdetails.setBackgroundColor(Color.argb(255, 244, 245, 241));
+		sv_webview = (ScrollView) findViewById(R.id.sv_details_webview);
+		ll_bottom = (LinearLayout) findViewById(R.id.ll_details_bottom);
+		iv_mode = (ImageView) findViewById(R.id.bt_details_mode);
+
+	}
+	public void initPopView(){
+		
+		popview = this.getLayoutInflater().inflate(R.layout.details_popmenu,null);
+		bt1 = (Button) popview.findViewById(R.id.bt_pop_bt1);
+		bt2 = (Button) popview.findViewById(R.id.bt_pop_bt2);
+		
+		
+	}
+	
+	public void initData(){
+		//从listView中获取数据
+		
+		Intent intent = getIntent();
+		String title = intent.getStringExtra("title");
+		String date = intent.getStringExtra("date");
+		String url = intent.getStringExtra("url");
+		String sourcename = intent.getStringExtra("sourcename");
+		System.out.println("------>url="+url);
+		tv_title.setText(title);
+		tv_data.setText(sourcename+"  "+date);
+		wv_showdetails.loadUrl(url);
+		wv_showdetails.setOnTouchListener(new MyOnTouchListener());
+		
+		size_setting = wv_showdetails.getSettings();
+		size_setting.setTextSize(TextSize.NORMAL);
+		checkItem = 2;//默认为normol大小
+		currentMode = 6;//默认为sun格式
+		
+		currentLight = getScreenBrightness(this);
+	}
+	class MyOnTouchListener implements OnTouchListener{
+
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			// TODO Auto-generated method stub
+			
+			int height_title = getTitleHeight();
+			System.out.println("height = "+height_title);
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				if (popmenu != null && popmenu .isShowing()) {
+					popmenu.dismiss();
+				}
+				//rl_title 0,sv_webview  height随手机滑动改变padding值
+				
+				
+				
+				break;
+			case MotionEvent.ACTION_MOVE:
+				
+				break;
+
+			default:
+				break;
+			}
+			
+			return true;
+		}
+		
+	}
+	
+	public int getTitleHeight(){
+		rl_title.measure(0, 0);
+		
+		int height = rl_title.getMeasuredHeight();
+		
+		return height;
+	}
+	
+	public void back(View v){
+		//可以将finish的过程优化
+		finish();
+	}
+	public void changesize(View v){
+		if (popmenu!= null && popmenu.isShowing()) {
+			popmenu.dismiss();
+		}
+		popmenu = new PopupWindow(popview, 320, 150);
+		bt1.setText("变大");
+		bt2.setText("变小");
+		//字体点击改变
+		bt1.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				sizemax();
+			}
+		});
+		//字体点击变小
+		bt2.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				sizemin();
+			}
+		});
+		popmenu.showAsDropDown(v);
+		popmenu.showAtLocation(findViewById(R.id.bt_details_size), Gravity.CENTER, 20, 20);
+		
+	}
+	public void changemode(View v){
+		
+		//交换模式，日间或夜间
+		
+		//setBackGroundcolor失效
+		if (currentMode == MODE_MOON) {
+			//修改为日间
+			wv_showdetails.setBackgroundColor(Color.argb(255, 244, 245, 241));
+			//蓝色
+			rl_title.setBackgroundColor(Color.argb(255, 3, 169, 244));
+			//白色
+			ll_bottom.setBackgroundColor(Color.argb(255, 244, 245, 241));
+			currentMode = MODE_SUN;
+			iv_mode.setImageResource(R.drawable.details_icon_mode_sun);
+			
+		}else if(currentMode == MODE_SUN){
+			//修改为夜间
+			
+			wv_showdetails.setBackgroundColor(Color.BLACK);
+			rl_title.setBackgroundColor(Color.BLACK);
+			ll_bottom.setBackgroundColor(Color.BLACK);
+			currentMode = MODE_MOON;
+			iv_mode.setImageResource(R.drawable.details_icon_mode_moon);
+		}
+		
+		
+	}
+	public void changelight(View v){
+		if (popmenu!= null && popmenu.isShowing()) {
+			popmenu.dismiss();
+		}
+		popmenu = new PopupWindow(popview, 320, 150);
+		bt1.setText("变亮");
+		bt2.setText("变暗");
+		bt1.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				lightmax();
+			}
+		});
+		bt2.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				lightmin();
+			}
+		});
+		popmenu.showAsDropDown(v);
+		popmenu.showAtLocation(findViewById(R.id.bt_details_light), Gravity.CENTER, 20, 20);
+	}
+	public void share(View v){
+		showShare();
+	}
+	
+	private void showShare() {
+		 ShareSDK.initSDK(this);
+		 OnekeyShare oks = new OnekeyShare();
+		 //关闭sso授权
+		 oks.disableSSOWhenAuthorize(); 
+		 
+		// 分享时Notification的图标和文字  2.5.9以后的版本不调用此方法
+		 //oks.setNotification(R.drawable.ic_launcher, getString(R.string.app_name));
+		 // title标题，印象笔记、邮箱、信息、微信、人人网和QQ空间使用
+		 oks.setTitle(getString(R.string.share));
+		 // titleUrl是标题的网络链接，仅在人人网和QQ空间使用
+		 oks.setTitleUrl("http://sharesdk.cn");
+		 // text是分享文本，所有平台都需要这个字段
+		 oks.setText("我是分享文本");
+		 // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+		 oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
+		 // url仅在微信（包括好友和朋友圈）中使用
+		 oks.setUrl("http://sharesdk.cn");
+		 // comment是我对这条分享的评论，仅在人人网和QQ空间使用
+		 oks.setComment("我是测试评论文本");
+		 // site是分享此内容的网站名称，仅在QQ空间使用
+		 oks.setSite(getString(R.string.app_name));
+		 // siteUrl是分享此内容的网站地址，仅在QQ空间使用
+		 oks.setSiteUrl("http://sharesdk.cn");
+		 
+		// 启动分享GUI
+		 oks.show(this);
+		 }
+	
+	public void sizemax(){
+		//字体变大
+		/*size_setting.setTextSize(TextSize.NORMAL);
+		checkItem = 2;*/
+		if (checkItem < 4) {
+			checkItem++;
+			size_setting.setTextSize(textSizes[checkItem]);
+		}else {
+			Toast.makeText(this, "抱歉，字体已是最大", 0).show();
+		}
+		
+	}
+	public void sizemin(){
+		//字体变小
+		if (checkItem > 0) {
+			checkItem--;
+			size_setting.setTextSize(textSizes[checkItem]);
+		}else {
+			Toast.makeText(this, "抱歉，字体已是最小", 0).show();
+		}
+	}
+	
+	public void lightmax(){
+		//变亮
+		if (currentLight < 236) {
+			currentLight += 20;
+			lightrefresh();
+		}else {
+			Toast.makeText(this, "抱歉，屏幕亮度已是最大", 0).show();
+		}
+		
+		
+	}
+	
+	public void lightmin(){
+		//屏幕变小
+		if (currentLight >= 20) {
+			currentLight -= 20;
+			lightrefresh();
+		}else {
+			Toast.makeText(this, "抱歉，屏幕亮度已是最小", 0).show();
+		}
+	}
+	
+	public void lightrefresh(){
+		WindowManager.LayoutParams params = getWindow().getAttributes();
+	    params.screenBrightness = currentLight / 255f;
+	    getWindow().setAttributes(params);
+	}
+	
+	public static int getScreenBrightness(Activity activity) {
+	    int value = 0;
+	    ContentResolver cr = activity.getContentResolver();
+	    try {
+	        value = Settings.System.getInt(cr, Settings.System.SCREEN_BRIGHTNESS);
+	    } catch (SettingNotFoundException e) {
+	        
+	    }
+	    return value;
+	}
+
+
+
+}

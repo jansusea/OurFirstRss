@@ -1,0 +1,175 @@
+package com.skyrss;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.skyrss.bean.SourceBean;
+import com.skyrss.dao.SourceDao;
+import com.skyrss.global.NightModeUpdate;
+import com.skyrss.global.SourceList;
+import com.skyrss.utils.ChangeAppBrightness;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class FindmoreActivity extends Activity {
+	
+	private ListView lv_findmore_itemlist;
+	private CheckBox cb_add;
+	private SourceDao dao;
+	private List<SourceBean> sourcelist;
+	private List<String> addlist;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_findmore);
+		
+		dao = new SourceDao(this);
+		sourcelist = new ArrayList<SourceBean>();
+		sourcelist = dao.getAllSource();
+		
+		addlist = new ArrayList<String>();
+		
+		lv_findmore_itemlist=(ListView) findViewById(R.id.lv_findmore_itemlist);
+		lv_findmore_itemlist.setAdapter(new MyNewsSourceAdapter());
+		lv_findmore_itemlist.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				//跳转到listView中显示该源的数据
+				SourceBean source = sourcelist.get(position);
+				Toast.makeText(FindmoreActivity.this, source.getName(), 0).show();
+				Intent intent = new Intent(FindmoreActivity.this,SourceActivity.class);
+				intent.putExtra("source", position);
+				intent.putExtra("sourcename", source.getName());
+				startActivity(intent);
+			}
+		});
+	}
+	
+	class MyNewsSourceAdapter extends BaseAdapter {
+
+		private SourceBean sourceitem;
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return sourcelist.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			
+			sourceitem = sourcelist.get(position);
+			
+			View v = View.inflate(FindmoreActivity.this, R.layout.items_findlist,
+					null);
+			TextView tv_sourcelist_name = (TextView) v.findViewById(R.id.tv_itemsfind_itemname);
+			
+			//判断gridView中是否存在该源，存在则设置为true，不存在设置为false
+			cb_add = (CheckBox) v.findViewById(R.id.ib_itemsfind_add);
+			
+			if (sourceitem.isIschoosed()) {
+				cb_add.setChecked(true);
+			}else {
+				cb_add.setChecked(false);
+			}
+			
+			cb_add.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					//点击添加源
+					if (!cb_add.isChecked()) {
+						//如果没有被选中，则设置为选中，并将数据添加到home中
+						cb_add.setChecked(true);
+						addlist.add(sourceitem.getName());
+					}
+				}
+			});
+			tv_sourcelist_name.setText(sourceitem.getName());
+
+			return v;
+		}
+	}
+	public void addchecked(View v){
+		//确认选择，添加到gridview中，返回homeActivity  类似完成功能
+		//添加线程操作~~
+		/*Handler myHandler = new Handler(){
+
+			@Override
+			public void handleMessage(Message msg) {
+				// TODO Auto-generated method stub
+				super.handleMessage(msg);
+				switch (msg.what) {
+				case 1:
+					Intent intent = new Intent(FindmoreActivity.this, HomeActivity.class);
+					startActivity(intent);
+					break;
+
+				default:
+					break;
+				}
+			}
+			
+		};
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+				Message msg = new Message();*/
+				for(String additem : addlist){
+					dao.addtohome(additem);
+				}
+			/*	
+			}
+		}).start();*/
+	}
+	
+	public void backhome(View v) {
+		Intent intent = new Intent(this, HomeActivity.class);
+		startActivity(intent);
+		//跳转的时候的页面滑动效果
+		overridePendingTransition(R.anim.pre_enteranim, R.anim.pre_exitanim);
+	}
+	
+	@Override
+	protected void onResume() {
+		NightModeUpdate.update(this);
+		super.onResume();
+	}
+	
+}

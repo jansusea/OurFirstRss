@@ -1,0 +1,103 @@
+package com.skyrss.dao;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.skyrss.bean.SourceBean;
+import com.skyrss.db.SourceDBHelper;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+public class SourceDao {
+	
+	
+	SQLiteDatabase db ;
+	private SourceDBHelper helper;
+	
+	public SourceDao(Context ctx){
+		/*helper = new MyBlackNumOpenHelper(ctx, "blacknum.db", null, 1);
+ 		this.db = helper.getReadableDatabase();*/
+		
+		helper = new SourceDBHelper(ctx, "source.db", null, 1);
+		this.db = helper.getReadableDatabase();
+	}
+	
+	public List<SourceBean> getAllSource(){//单元测试无BUG
+		//获取所有数据库中的数据
+		List<SourceBean> sourcelist = new ArrayList<SourceBean>();
+		
+		Cursor cursor = db.query("sourceinfo", new String[]{"sname","surl","sischoosed"}, null, null, null, null, null);
+	
+		while (cursor.moveToNext()) {
+			String name = cursor.getString(0);
+			String url = cursor.getString(1);
+			int intchoose = cursor.getInt(2);
+			boolean ischoosed ;
+			if (intchoose == 0) {
+				ischoosed = false;//在home中没有
+			}else {
+				ischoosed = true;//home中已经存在
+			}
+			SourceBean source = new SourceBean(name, url, ischoosed);
+			sourcelist.add(source);
+		}
+		return sourcelist;	
+	}
+	
+	public List<SourceBean> getAllChecked(){//单元测试成功
+		List<SourceBean> checkedlist = new ArrayList<SourceBean>();
+		
+		Cursor cursor = db.query("sourceinfo", new String[]{"sname","surl","sischoosed"}, null, null, null, null, null);
+	
+		while (cursor.moveToNext()) {
+			String name = cursor.getString(0);
+			String url = cursor.getString(1);
+			int intchoose = cursor.getInt(2);
+			boolean ischoosed ;
+			if (intchoose == 1) {
+				SourceBean source = new SourceBean(name, url, true);
+				checkedlist.add(source);
+			}
+			
+		}
+		return checkedlist;
+	}
+	
+	public boolean IsChoosed(String name){//单元测试无bug
+		//判断该name的源是否已经在home中显示
+		boolean flag = false ;
+		Cursor cursor = db.query("sourceinfo", new String[]{"sname","surl","sischoosed"}, "sname = ?", new String[]{name}, null, null, null);
+		cursor.moveToNext();//这句不能漏掉。。。
+		if(cursor.getInt(2) == 1){
+			flag = true;
+		}
+		return flag;
+		
+	}
+	
+	public void addtohome(String name){//单元测试无bug
+		ContentValues values = new ContentValues();
+		values.put("sischoosed", 0);//应该为1
+		db.update("sourceinfo", values, "sname = ?", new String[]{name});
+	}
+	
+	public void removefromhome(String name){
+		db.delete("sourceinfo", "sname = ?", new String[]{name});
+	}
+	
+	public void selfadd(String name,String url){//单元测试无bug
+		//用户手动添加的源，判断合法后添加
+		ContentValues values = new ContentValues();
+		values.put("sname", name);
+		values.put("surl", url);
+		values.put("sischoosed", 1);//默认将用户自己手动添加的源添加到home中,true为1
+		
+		db.insert("sourceinfo", null, values);
+	}
+	
+
+}

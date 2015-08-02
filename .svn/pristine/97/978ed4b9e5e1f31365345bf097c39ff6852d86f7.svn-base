@@ -1,0 +1,7 @@
+package com.skyrss.global;
+
+public class SourceList {
+
+	public static String[] sourceList = {"http://cn.engadget.com/rss.xml", "http://www.zhihu.com/rss"};
+	
+}

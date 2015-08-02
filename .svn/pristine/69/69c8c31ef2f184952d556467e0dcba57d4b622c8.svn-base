@@ -1,0 +1,144 @@
+package com.skyrss;
+
+import java.util.ArrayList;
+import java.util.List;
+import com.skyrss.utils.DensityUtil;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+public class GuideActivity extends Activity {
+	public static final String TAG ="FirstIntroductionActivity";
+	int[] images = new int[] { R.drawable.guide1, R.drawable.guide2};
+	List<ImageView> imagelist;//不能直接用上面的资源ID，还是要实例化图像的列表
+	Button bt_enter;
+	SharedPreferences sp;
+	LinearLayout ll_pointgroup;
+	View view_redpoint;
+	int mpwidth;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_guide);
+		ViewPager vp = (ViewPager) findViewById(R.id.vp_firstentersplash_introduce);
+		bt_enter=(Button) findViewById(R.id.bt_firstentersplash_enter);
+		ll_pointgroup=(LinearLayout) findViewById(R.id.ll_firstenter_pointgroup);
+		view_redpoint=findViewById(R.id.view_firstenter_redpoint);
+		sp=getSharedPreferences("config", MODE_PRIVATE);
+		imagelist = new ArrayList<ImageView>();
+	
+		initviews();
+		vp.setAdapter(new MyPagerAdapter());//都是要适配器的
+		vp.setOnPageChangeListener(new MyListener());//要搞状态需要设置监听
+		
+	}
+	private void initviews() {
+		for (int i : images) {
+			ImageView iv = new ImageView(this);
+			iv.setBackgroundResource(i);
+			imagelist.add(iv);
+		}
+		for(int i=0;i<images.length;i++){
+			View point=new View(this);
+			point.setBackgroundResource(R.drawable.shape_pointer_gray);
+			LinearLayout.LayoutParams params=new LinearLayout.
+					
+					LayoutParams(DensityUtil.dp2pix(this, 10),
+							DensityUtil.dp2pix(this, 10));
+					Log.d(TAG,DensityUtil.dp2pix(this, 10)+"");
+			if(i>0){
+				params.leftMargin=DensityUtil.dp2pix(this, 10);
+			}
+			point.setLayoutParams(params);
+			ll_pointgroup.addView(point);
+		}
+		ll_pointgroup.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			
+
+			@SuppressLint("NewApi")
+			@Override
+			public void onGlobalLayout() {
+				mpwidth=ll_pointgroup.getChildAt(1).getLeft()-ll_pointgroup.getChildAt(0).getLeft();
+				ll_pointgroup.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+			}
+		});
+		
+		
+	}
+
+	class MyPagerAdapter extends PagerAdapter {
+
+		@Override
+		public int getCount() {
+			return imagelist.size();
+		}
+
+		@SuppressLint("NewApi")
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			return view == object;
+		}
+
+		@Override  
+		public Object instantiateItem(ViewGroup container, int position) {
+			container.addView(imagelist.get(position));
+			return imagelist.get(position);
+		}
+
+		@Override  
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			container.removeView((View) object);//直接销毁传来的object即可
+		}
+
+	}
+
+	class MyListener implements OnPageChangeListener {
+
+		@Override
+		public void onPageScrolled(int position, float positionOffset,
+				int positionOffsetPixels) {
+			int len=(int) (mpwidth*positionOffset+position*mpwidth);//设置间距
+			RelativeLayout.LayoutParams params=(RelativeLayout.LayoutParams) 
+					view_redpoint.getLayoutParams();//用一个相对布局来构造，用红色点的布局元素
+			params.leftMargin=len;
+			view_redpoint.setLayoutParams(params);
+		}
+
+		@Override
+		public void onPageSelected(int position) {
+			if(position==imagelist.size()-1){
+				bt_enter.setVisibility(View.VISIBLE);
+			}else{
+				bt_enter.setVisibility(View.INVISIBLE);
+			}
+			
+		}
+
+		@Override
+		public void onPageScrollStateChanged(int state) {
+		}
+
+	}
+	public void enter(View v){
+		Intent intent=new Intent(this,HomeActivity.class);
+		Editor et=sp.edit();
+		et.putBoolean("firstenter", false);
+		et.commit();
+		startActivity(intent);
+		finish();
+	}
+}

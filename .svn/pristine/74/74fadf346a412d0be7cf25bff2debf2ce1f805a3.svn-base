@@ -1,0 +1,66 @@
+package com.skyrss.setting;
+
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import cn.jpush.android.api.JPushInterface;
+
+import com.skyrss.R;
+import com.skyrss.ui.SlideSwitch;
+import com.skyrss.ui.SlideSwitch.SlideListener;
+
+public class MoreSetting extends Activity {
+	private ImageButton ib_back;
+	SlideSwitch ss;
+	TextView tv_description;
+	SharedPreferences sp;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_setting_moresetting);
+		sp = getSharedPreferences("config", MODE_PRIVATE);
+		ib_back = (ImageButton) findViewById(R.id.ib_back);
+		ib_back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+
+		ss = (SlideSwitch) findViewById(R.id.ss_moresetting_test);
+		tv_description = (TextView) findViewById(R.id.tv_setting_description);
+		Boolean pushstate = sp.getBoolean("JPUSH", true);
+		if(!pushstate){
+			ss.setState(pushstate);	
+			tv_description.setText("推送已经关闭");
+		}
+		ss.setSlideListener(new SlideListener() {
+			Editor et;
+
+			@Override
+			public void open() {
+				tv_description.setText("推送已经开启");
+				et = sp.edit();
+				et.putBoolean("JPUSH", true);
+				et.commit();
+				JPushInterface.resumePush(getApplicationContext());
+			}
+
+			@Override
+			public void close() {
+				tv_description.setText("推送已经关闭");
+				et = sp.edit();
+				et.putBoolean("JPUSH", false);
+				et.commit();
+				JPushInterface.stopPush(getApplicationContext());
+			}
+		});
+	}
+}

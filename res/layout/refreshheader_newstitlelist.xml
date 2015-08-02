@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal" >
+    
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp" >
+
+        <ImageView
+            android:id="@+id/iv_refreshheader_arr"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/newstitlelist_headview_arrow" />
+        <LinearLayout 
+            android:id="@+id/ll_refreshheader_dots"
+            android:layout_width="30dp"
+			android:layout_height="30dp"
+			android:layout_gravity="center_vertical"
+			android:gravity="center"
+			android:visibility="invisible"
+	        >
+            <ImageView
+                android:id="@+id/iv_refreshheader_dot1"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="#02CBF9"
+                android:layout_marginLeft="5dp"
+                />
+            <ImageView
+                android:id="@+id/iv_refreshheader_dot2"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="#02CBF9"
+                android:layout_marginLeft="5dp"
+                />
+            <ImageView
+                android:id="@+id/iv_refreshheader_dot3"
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:background="#02CBF9"
+                android:layout_marginLeft="5dp"
+                />
+            
+        </LinearLayout>
+        
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_refreshheader_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下拉刷新"
+            android:textColor="#02CBF9"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+    
+
+</LinearLayout>

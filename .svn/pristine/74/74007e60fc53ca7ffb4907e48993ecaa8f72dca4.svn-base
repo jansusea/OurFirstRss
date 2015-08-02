@@ -1,0 +1,24 @@
+package com.skyrss.utils;
+
+public class ExtractImgUrlUtil {
+
+	public static String extractUrl(String data) {
+		String url = "";
+
+		if (data.contains("<img")) {
+			int i = data.indexOf("src=\"");
+
+			System.out.println("match成功" + i);
+			if (i != -1) {
+				String subString = data.substring(i + 5);
+				int j = subString.indexOf("\"");
+				System.out.println("j=" + j);
+				url = subString.substring(0, j);
+			}
+		}
+		System.out.println(url);
+
+		return url;
+	}
+
+}

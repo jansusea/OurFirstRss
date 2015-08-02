@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#33000000"
+    android:orientation="vertical"
+     >
+    
+    <TextView 
+        android:id="@+id/tv_moresetting_push"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="你好我们是skyRss的作者\n有任何关于使用的疑问或者意见，欢迎电邮\nmichaelhenry1992@hotmail.com\n"
+        android:gravity="center_vertical"
+        android:focusable="true"
+        />
+    
+</LinearLayout>
+
+
+

@@ -1,0 +1,17 @@
+package com.skyrss.setting;
+
+import com.skyrss.R;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class MoreSetting extends Activity{
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.setting_moresetting_appintroduction);
+		TextView tv=(TextView) findViewById(R.id.tv_moresetting_appintroduction);
+		tv.setText("这个软件是我们举多人开发的产品。。欢迎关注后续版本，请一定注意要在wifi情况下使用本软件");
+	}
+}

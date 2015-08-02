@@ -1,0 +1,68 @@
+package com.skyrss.global;
+
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.skyrss.R;
+
+public class SourceList {
+
+	//使用set防止元素重复
+	public static LinkedHashSet<String> sourceUrlList = new LinkedHashSet<String>();
+	public static LinkedHashSet<String> sourceNameList = new LinkedHashSet<String>();
+	public static LinkedHashSet<Integer> sourceIconList = new LinkedHashSet<Integer>();
+	public static void init(Context ctx) {
+		// TODO Auto-generated method stub
+		SharedPreferences sp = ctx.getSharedPreferences("config", Context.MODE_PRIVATE);
+		
+		initUrls();
+		initNames();
+		initIcons();
+		
+		String sourcesString = sp.getString("sourceurl", "");
+		String namesString = sp.getString("sourcename", "");
+		
+		if(sourcesString.length() != 0){
+			String[] sources = sourcesString.split(",");
+			for (String string : sources) {
+				sourceUrlList.add(string);
+			}
+		}
+		
+		if (namesString.length() != 0) {
+			String[] names = namesString.split(",");
+			for (String string : names) {
+				sourceNameList.add(string);
+			}
+		}
+		
+	}
+
+	private static void initIcons() {
+		sourceIconList.add(R.drawable.ic_engadget);
+		sourceIconList.add(R.drawable.ic_zhihu);
+		sourceIconList.add(R.drawable.ic_36kr);
+		sourceIconList.add(R.drawable.ic_ifanr);
+		sourceIconList.add(R.drawable.ic_geekpark);
+	}
+
+	private static void initNames() {
+		sourceNameList.add("Engadget中国");
+		sourceNameList.add("知乎精选");
+		sourceNameList.add("36氪");
+		sourceNameList.add("爱范儿");
+		sourceNameList.add("极客公园");
+	}
+
+	private static void initUrls() {
+		sourceUrlList.add("http://cn.engadget.com/rss.xml");
+		sourceUrlList.add("http://www.zhihu.com/rss");
+		sourceUrlList.add("http://www.36kr.com/feed/");
+		sourceUrlList.add("http://www.ifanr.com/feed");
+		sourceUrlList.add("http://www.geekpark.net/rss");
+	}
+	
+}

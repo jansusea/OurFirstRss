@@ -1,0 +1,48 @@
+package com.skyrss.utils;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import android.provider.ContactsContract.Contacts.Data;
+import android.widget.Toast;
+
+public class PubDateFormatUtils {
+	
+	private static Date datt;
+	private static Date newdate;
+
+	public static String formatDate(String date) {
+		
+		String realDate = "";
+/*		System.out.println("----->date  Wed, 15 Jul 2015 21:00:00 +0800----> "+date);
+		
+		if (date.contains("-")) {
+			realDate = date.replaceAll("\\s-\\d{4}", "");
+			System.out.println(date.replaceAll("\\s-\\d{4}", "")+"转换完成");
+		} else if (date.contains("+")) {
+			realDate = date.replaceAll("\\s\\+\\d{4}", "");
+			System.out.println(date.replaceAll("\\s\\+\\d{4}", "")+"转换完成");
+		}*/
+
+		Date time = new Date();
+		//Z 对于格式化来说，使用 RFC 822 4-digit 时区格式 ,Locale.US表示使用了美国时间 
+		SimpleDateFormat sdf =
+		                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
+		try {
+			time = sdf.parse(date);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		realDate = sdf2.format(time);
+		/*System.out.println("realdate  = "+realDate);*/
+		return realDate;
+	}
+	
+
+}

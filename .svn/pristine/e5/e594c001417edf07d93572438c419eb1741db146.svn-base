@@ -1,0 +1,116 @@
+package com.skyrss;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.skyrss.setting.UserFeedbackActivity;
+import com.skyrss.utils.ChangeAppBrightness;
+
+public class SettingActivity extends Activity implements OnClickListener {
+	private static final String TAG = null;
+	private TextView tv_night;
+	private TextView tv_offlinedown;
+	private TextView tv_clearcache;
+	private TextView tv_moresetting;
+	private TextView tv_userfeed;
+	private TextView tv_checkupdate;
+	private TextView tv_goodcomment;
+	private TextView tv_aboutus;
+	
+	SharedPreferences sp;
+
+	// 设置夜间模式
+	public Boolean currentNightMode=false;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_setting);
+		sp=getSharedPreferences("config", MODE_PRIVATE);
+		tv_night = (TextView) findViewById(R.id.tv_setting_nightmode);
+		tv_offlinedown=(TextView) findViewById(R.id.tv_setting_offlinedownload);
+		tv_clearcache=(TextView) findViewById(R.id.tv_setting_clearcache);
+		tv_moresetting=(TextView) findViewById(R.id.tv_setting_moresetting);
+		tv_userfeed=(TextView) findViewById(R.id.tv_setting_userfeed);
+		tv_checkupdate=(TextView) findViewById(R.id.tv_setting_checkupdate);
+		tv_goodcomment=(TextView) findViewById(R.id.tv_setting_goodcomment);
+		tv_aboutus=(TextView) findViewById(R.id.tv_setting_aboutus);
+		
+		tv_night.setOnClickListener(this);
+		tv_offlinedown.setOnClickListener(this);
+		tv_clearcache.setOnClickListener(this);
+		tv_moresetting.setOnClickListener(this);
+		tv_userfeed.setOnClickListener(this);
+		tv_checkupdate.setOnClickListener(this);
+		tv_goodcomment.setOnClickListener(this);
+		tv_aboutus.setOnClickListener(this);
+		
+	}
+	
+	@Override
+	protected void onResume() {
+		currentNightMode = sp.getBoolean("nightmode", false);
+		if(currentNightMode){
+			ChangeAppBrightness.change(this, 3);
+		}else{
+			ChangeAppBrightness.change(this, 200);
+		}
+		super.onResume();
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_setting_nightmode:
+			changemode();
+			break;
+		case R.id.tv_setting_clearcache:
+			Toast.makeText(this, "目前功能正在开发中", 0).show();
+			break;
+		case R.id.tv_setting_moresetting:
+			Toast.makeText(this, "目前功能正在开发中", 0).show();
+			break;
+		case R.id.tv_setting_userfeed:
+			Intent intent=new Intent(this,UserFeedbackActivity.class);
+			startActivity(intent);
+			break;
+		case R.id.tv_setting_checkupdate:
+			Toast.makeText(this, "目前功能正在开发中", 0).show();
+			break;
+		case R.id.tv_setting_goodcomment:
+			Toast.makeText(this, "目前功能正在开发中", 0).show();
+			break;
+		case R.id.tv_setting_aboutus:
+			Toast.makeText(this, "目前功能正在开发中", 0).show();
+			break;
+		default:
+			Toast.makeText(this, "没有找到", 0).show();
+			break;
+		}
+	}
+
+	public void changemode() {
+		currentNightMode=sp.getBoolean("nightmode", false);
+		Editor et=sp.edit();
+		if (currentNightMode) {
+			ChangeAppBrightness.change(this, 200);
+			et.putBoolean("nightmode", !currentNightMode);
+		} else{
+			ChangeAppBrightness.change(this, 2);
+			et.putBoolean("nightmode", !currentNightMode);
+		}
+		et.commit();
+		
+	}
+	
+	
+	
+
+}

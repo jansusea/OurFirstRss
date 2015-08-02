@@ -1,0 +1,100 @@
+package com.skyrss;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.skyrss.global.SourceList;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+
+public class FindmoreActivity extends Activity {
+	
+	private ListView lv_findmore_itemlist=null;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_findmore);
+		
+		lv_findmore_itemlist=(ListView) findViewById(R.id.lv_findmore_itemlist);
+		lv_findmore_itemlist.setAdapter(new MyNewsSourceAdapter());
+		
+		lv_findmore_itemlist.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Intent intent = new Intent(FindmoreActivity.this,
+						SourceActivity.class);
+				intent.putExtra("source", position);
+				intent.putExtra("sourcename", (String)SourceList.sourceNameList.toArray()[position]);
+				startActivity(intent);
+				
+			}
+		});
+	}
+	
+	class MyNewsSourceAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return SourceList.sourceNameList.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			View v = View.inflate(FindmoreActivity.this, R.layout.items_findlist,
+					null);
+			TextView tv_sourcelist_name = (TextView) v
+					.findViewById(R.id.tv_itemsfind_itemname);
+			ImageView iv_sourcelist_logo = (ImageView) v
+					.findViewById(R.id.iv_itemsfind_logo);
+			tv_sourcelist_name.setText((String) SourceList.sourceNameList.toArray()[position]);
+			iv_sourcelist_logo.setImageResource((Integer) SourceList.sourceIconList.toArray()[position]);
+
+			return v;
+		}
+	}
+	
+	
+
+	
+	public void backhome(View v) {
+		Intent back=new Intent(FindmoreActivity.this,HomeActivity.class);
+		startActivity(back);
+		finish();
+	}
+	
+	
+}

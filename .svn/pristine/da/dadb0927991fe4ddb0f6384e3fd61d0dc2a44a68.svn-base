@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<translate
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromXDelta="0"
+    android:toXDelta="100%p"
+    android:duration="500">
+    <!--toXDelta  里面可以填三中类型的值：0=> absolute  100%=> relationtoself 100%p=> relativetoparent  -->
+    
+
+</translate>

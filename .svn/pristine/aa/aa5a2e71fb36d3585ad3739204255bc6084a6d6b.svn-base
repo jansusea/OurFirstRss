@@ -1,0 +1,154 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:item="http://schemas.android.com/apk/res/com.skyrss"
+    xmlns:myitem="http://schemas.android.com/apk/res/com.skyrss"
+    xmlns:slideswitch="http://schemas.android.com/apk/res/com.skyrss"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_setting_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#55000000"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tv_home_title"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:background="#03A9F4"
+            android:gravity="center"
+            android:text="设置"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp" />
+
+        <ImageButton
+            android:id="@+id/ib_home_slidingmenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@null"
+            android:src="@drawable/findmore_back" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_margin="3dp" >
+
+                <TextView
+                    android:id="@+id/tv_setting_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="夜间模式"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tv_setting_nightdescription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_setting_title"
+                    android:layout_marginLeft="5dp"
+                    android:text="夜间模式已经关闭"
+                    android:textColor="#99000000"
+                    android:textSize="14sp" />
+
+                <com.skyrss.ui.SlideSwitch
+                    android:id="@+id/ss_setting_isnight"
+                    android:layout_width="55dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    slideswitch:isOpen="false"
+                    slideswitch:shape="rect"
+                    slideswitch:themeColor="#6495ed" >
+                </com.skyrss.ui.SlideSwitch>
+
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#99000000" />
+            </RelativeLayout>
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_download"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="将rss信息下载到本地"
+                item:itemtitle="离线下载" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_clearcache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="清除缓存在本地的数据"
+                item:itemtitle="清除缓存" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_moresetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="更多个性化设置"
+                item:itemtitle="更多设置" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="#55000000" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_userfeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="欢迎向我们提出意见"
+                item:itemtitle="用户反馈" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_updade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="当前版本为1.0"
+                item:itemtitle="检查更新" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_good"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="您的支持对我们很重要"
+                item:itemtitle="给我们好评" />
+
+            <com.skyrss.ui.SettingItemJump
+                android:id="@+id/si_setting_aboutus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                item:itemdescription="SKY的介绍及联系方式"
+                item:itemtitle="关于我们" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

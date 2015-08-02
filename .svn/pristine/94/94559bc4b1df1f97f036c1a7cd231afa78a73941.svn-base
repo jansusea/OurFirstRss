@@ -1,0 +1,222 @@
+package com.skyrss;
+
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.skyrss.bean.NewsDetail;
+import com.skyrss.bean.NewsDetail.NewsItem;
+import com.skyrss.global.SourceList;
+import com.skyrss.ui.RefreshListView;
+import com.skyrss.ui.RefreshListView.onRefreshListener;
+import com.skyrss.utils.ExtractImgUrlUtil;
+import com.skyrss.utils.PubDateFormatUtils;
+import com.skyrss.utils.XmlparserUtils;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class SourceActivity extends Activity {
+
+	private NewsDetail detail;
+	private TextView tv_source_title;
+	private RefreshListView lv_source_titlelist;
+	private MyNewsTitleListAdapter adapter;
+	private String sourceName;
+	private int source;
+	private SharedPreferences sp;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_source);
+		
+		sp = getSharedPreferences("config", MODE_PRIVATE);
+
+		tv_source_title = (TextView) findViewById(R.id.tv_source_title);
+		lv_source_titlelist = (RefreshListView) findViewById(R.id.lv_source_titlelist);
+
+		Intent intent = getIntent();
+		source = intent.getIntExtra("source", 0);
+		sourceName = intent.getStringExtra("sourcename");
+		
+		lv_source_titlelist.setOnRefreshListner(new onRefreshListener() {
+			
+			@Override
+			public void onRefesh() {
+				// TODO Auto-generated method stub
+				getDataFromInternet(source);
+			}
+			
+			@Override
+			public void onLoadmore() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		getDataFromInternet(source);
+
+	}
+
+	private void getDataFromInternet(int sourceid) {
+
+		HttpUtils httpUtils = new HttpUtils();
+		httpUtils.send(HttpMethod.GET, SourceList.sourceUrlList[sourceid],
+				new RequestCallBack<String>() {
+
+					@Override
+					public void onFailure(HttpException error, String msg) {
+						// TODO Auto-generated method stub
+						error.printStackTrace();
+						Log.w("connect", msg);
+						Toast.makeText(getApplicationContext(), "网络连接失败", 0).show();
+					}
+
+					@Override
+					public void onSuccess(ResponseInfo<String> arg0) {
+						detail = XmlparserUtils.Xmlparse(arg0.result);
+						System.out.println(detail.items.size());
+
+						tv_source_title.setText(sourceName);
+						adapter = new MyNewsTitleListAdapter();
+						lv_source_titlelist.setAdapter(adapter);
+
+						lv_source_titlelist
+								.setOnItemClickListener(new OnItemClickListener() {
+
+									@Override
+									public void onItemClick(
+											AdapterView<?> parent, View view,
+											int position, long id) {
+										// TODO Auto-generated method stub
+										NewsItem newsItem = detail.items
+												.get(position);
+										setTextColorAndSave(view, newsItem.title);
+
+										String date = PubDateFormatUtils
+												.formatDate(newsItem.pubDate);
+
+										Intent intent = new Intent(
+												SourceActivity.this,
+												DetailsActivity.class);
+										intent.putExtra("date", date);
+										intent.putExtra("title", newsItem.title);
+										intent.putExtra("url", newsItem.link);
+										intent.putExtra("sourcename",
+												sourceName);
+										startActivity(intent);
+									}
+
+								});
+						
+						lv_source_titlelist.onRefreshComplete();
+					}
+				});
+	}
+	
+	private void setTextColorAndSave(View view, String readNew) {
+		TextView tView = (TextView) view.findViewById(R.id.tv_newstitlelist_title);
+		tView.setTextColor(Color.GRAY);
+		
+		String read = sp.getString("read", "");
+		Editor editor = sp.edit();
+		editor.putString("read", read + readNew + ",");
+		editor.commit();
+	}
+
+	class MyNewsTitleListAdapter extends BaseAdapter {
+
+		private BitmapUtils bitmapUtils;
+
+		public MyNewsTitleListAdapter() {
+			bitmapUtils = new BitmapUtils(SourceActivity.this);
+			bitmapUtils.configDefaultLoadFailedImage(SourceList.sourceIconList[source]);
+		}
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return detail.items.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			NewsItem newsItem = detail.items.get(position);
+
+			View v;
+			ViewHolder holder;
+			if (convertView == null) {
+				v = View.inflate(SourceActivity.this,
+						R.layout.items_newstitlelist, null);
+				holder = new ViewHolder();
+				holder.tv_newstitlelist_title = (TextView) v
+						.findViewById(R.id.tv_newstitlelist_title);
+				holder.tv_newstitlelist_creator = (TextView) v
+						.findViewById(R.id.tv_newstitlelist_creator);
+				holder.iv_newstitlelist_img = (ImageView) v
+						.findViewById(R.id.iv_newstitlelist_img);
+				v.setTag(holder);
+			} else {
+				v = convertView;
+				holder = (ViewHolder) v.getTag();
+			}
+
+			holder.tv_newstitlelist_title.setText(newsItem.title);
+			holder.tv_newstitlelist_creator.setText(newsItem.creator);
+
+			String url = ExtractImgUrlUtil.extractUrl(newsItem.description);
+			bitmapUtils.display(holder.iv_newstitlelist_img, url);
+			
+			
+			String readNews = sp.getString("read", "");
+			if (!readNews.isEmpty()) {
+				if(readNews.contains(newsItem.title+",")) {
+					holder.tv_newstitlelist_title.setTextColor(Color.GRAY);
+				} else {
+					holder.tv_newstitlelist_title.setTextColor(Color.BLACK);
+				}
+			}
+
+			return v;
+		}
+
+		class ViewHolder {
+			public TextView tv_newstitlelist_title;
+			public TextView tv_newstitlelist_creator;
+			public ImageView iv_newstitlelist_img;
+		}
+
+	}
+
+}

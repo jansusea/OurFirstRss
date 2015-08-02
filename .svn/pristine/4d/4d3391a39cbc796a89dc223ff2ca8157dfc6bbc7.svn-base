@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/ll_details"
+    android:orientation="vertical" >
+    
+    <LinearLayout 
+        android:id="@+id/ll_details_title"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#69D2E7"
+        android:orientation="vertical"
+        android:paddingLeft="5dp"
+        >
+        <TextView 
+            android:id="@+id/tv_details_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:text="测试数据 标题栏标题栏标题栏"
+            android:paddingTop="20dp"
+            />
+        <TextView 
+            android:id="@+id/tv_details_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="8sp"
+            android:textColor="#FFFFFF"
+            android:text="腾讯娱乐  4小时前"
+            />
+    </LinearLayout>
+    <WebView 
+        android:id="@+id/wv_details_showcontent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1000"
+        />
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="2sp"
+        android:background="#FFFFFF"
+        />
+    <LinearLayout 
+        android:id="@+id/ll_details_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#F4F5F1"
+        >
+        <ImageView
+            android:contentDescription="返回"
+            android:id="@+id/bt_details_back"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_icon_back"
+            android:clickable="true"
+            android:onClick="back"
+            />
+        <ImageView
+            android:contentDescription="字体"
+            android:id="@+id/bt_details_size"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_icon_size"
+            android:clickable="true"
+            android:onClick="changesize"
+            />
+        <ImageView
+            android:contentDescription="夜间模式"
+            android:id="@+id/bt_details_mode"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_icon_mode_sun"
+            android:clickable="true"
+            android:onClick="changemode"
+            />
+        <ImageView
+            android:contentDescription="亮度"
+            android:id="@+id/bt_details_light"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_icon_light"
+            android:clickable="true"
+            android:onClick="changelight"
+            />
+        <ImageView
+            android:contentDescription="分享"
+            android:id="@+id/bt_details_share"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="30sp"
+            android:src="@drawable/details_icon_share"
+            android:clickable="true"
+            android:onClick="share"
+            />
+        
+    </LinearLayout>
+    
+
+</LinearLayout>

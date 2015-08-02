@@ -1,0 +1,48 @@
+package com.skyrss.ui;
+
+import com.skyrss.R;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+public class SettingItemJump extends RelativeLayout {
+
+	private TextView tv_title;
+	private TextView tv_description;
+
+	public SettingItemJump(Context context) {
+		super(context);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+	public SettingItemJump(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		// TODO Auto-generated constructor stub
+		init();
+	}
+
+	public SettingItemJump(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		// TODO Auto-generated constructor stub
+		init();
+		
+		String title = attrs.getAttributeValue("http://schemas.android.com/apk/res/com.skyrss", "itemtitle");
+		String description = attrs.getAttributeValue("http://schemas.android.com/apk/res/com.skyrss", "itemdescription");
+	
+		tv_title.setText(title);
+		tv_description.setText(description);
+	
+	}
+	
+	public void init(){
+		View view = View.inflate(getContext(), R.layout.settingitem_jump, this);
+		
+		tv_title = (TextView) view.findViewById(R.id.tv_setting_title);
+		tv_description = (TextView) view.findViewById(R.id.tv_setting_description);
+	}
+
+}

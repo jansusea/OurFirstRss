@@ -1,0 +1,51 @@
+package com.skyrss;
+
+import com.skyrss.R.id;
+import com.skyrss.fragment.FmselectionFragment;
+import com.skyrss.fragment.FmstoreFragment;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+
+public class FindmoreActivity extends FragmentActivity {
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_findmore);
+		
+	}
+
+	public void selection(View v) {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft =fm.beginTransaction();
+		
+		FmselectionFragment fragment=new FmselectionFragment();
+		ft.replace(R.id.ll_findmore,fragment);
+		ft.commit();
+	}
+	
+	public void addstore(View v) {
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction ft =fm.beginTransaction();
+		
+		FmstoreFragment fragment=new FmstoreFragment();
+		ft.replace(R.id.ll_findmore, fragment);
+		ft.commit();
+		
+	}
+	
+	public void backhome(View v) {
+		Intent back=new Intent(FindmoreActivity.this,HomeActivity.class);
+		startActivity(back);
+		finish();
+	}
+	
+	
+}

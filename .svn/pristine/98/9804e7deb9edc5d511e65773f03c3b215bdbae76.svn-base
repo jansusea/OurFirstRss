@@ -1,0 +1,40 @@
+package com.skyrss.bean;
+
+public class SourceBean {
+	
+	private String name;
+	private String url;
+	private boolean ischoosed;
+	public SourceBean(String name, String url, boolean ischoosed) {
+		super();
+		this.name = name;
+		this.url = url;
+		this.ischoosed = ischoosed;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public boolean isIschoosed() {
+		return ischoosed;
+	}
+	public void setIschoosed(boolean ischoosed) {
+		this.ischoosed = ischoosed;
+	}
+	@Override
+	public String toString() {
+		return "SourceBean [name=" + name + ", url=" + url + ", ischoosed="
+				+ ischoosed + "]";
+	}
+	
+	
+
+}
